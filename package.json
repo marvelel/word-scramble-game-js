@@ -1,0 +1,8 @@
+{
+    "name": "word-scramble-game-js",
+    "version": "1.0.0",
+    "description": "A word scramble game where the user attempts to unscramble words.",
+    "dependencies": {
+        "prompt-sync": "~4.2.0"
+    }
+}
