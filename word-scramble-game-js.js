@@ -1,22 +1,17 @@
+//TO DO - Allow player to rescramble word once per word, player's answer timed and points effected
+
 // WORD SCRAMBLE GAME //
-/*  1. Make the code to scramble words V
-    2. Words should not scramble to be the same, and should be at least some number of letters innacurate 
-    3. Player should be prompted to solve the puzzle, iterate if the player is incorrect, and move on to the next word if they are correct 
-    4. Player should not receive the same word twice per game (5 words per game) V
-    5. Words should avoid having other applicable solutions such that they can be unscrambled to make other words */
 
 //Function called to select five words at indicated difficulty, shuffle them, and return them to play with
 const prompt = require("prompt-sync")({sigint: true});
 
 function wordScramble(difficulty) {
-    let fiveWords = [];
-
     //Lists of words for each level of difficulty to unscramble
     let easyWords = 
-        ['acid', 'cage', 'cake', 'calf', 'calm', 'came', 'camp', 'earl', 'easy', 'echo', 'edge', 'gain', 'gala', 'gale', 'gate', 
+        ['acid', 'cage', 'cake', 'calf', 'calm', 'came', 'camp', 'even', 'easy', 'echo', 'edge', 'gain', 'gala', 'gale', 'gate', 
         'gave', 'idea', 'idle', 'idol', 'info', 'kegs', 'kelp', 'keys', 'kick', 'kite', 'knew', 'knit', 'lack', 'lady', 'land',
-        'lard', 'lava', 'lawn', 'laws', 'lazy', 'leaf', 'lend', 'liar', 'like', 'limb', 'limo', 'lute', 'many', 'mayo', 'meld', 
-        'mice', 'mild', 'mind', 'minx', 'miso', 'mold', 'most', 'myth'];
+        'lard', 'lava', 'lawn', 'laws', 'lazy', 'leaf', 'lend', 'like', 'limb', 'limo', 'lute', 'many', 'mayo', 'meld', 'mice', 
+        'mild', 'mind', 'minx', 'miso', 'mold', 'most', 'myth'];
     
     let medWords =
         ['about', 'above', 'actor', 'admit', 'again', 'bound', 'brain', 'bread', 'broke', 'build', 'catch', 'clean', 'chain', 
@@ -26,14 +21,27 @@ function wordScramble(difficulty) {
         'meant', 'needs', 'never', 'power', 'peace', 'party', 'pride', 'prime', 'scale', 'scene', 'scope', 'taxes', 'teach'];
 
     let hardWords =
-        [];
+        ['abroad', 'across', 'acting', 'active', 'advice', 'beyond', 'bishop', 'border', 'bottle', 'bought', 'cancer', 'cactus',
+        'chance', 'church', 'circle', 'damage', 'debate', 'decade', 'define', 'deputy', 'editor', 'effort', 'either', 'emerge',
+        'ending', 'fabric', 'forest', 'finger', 'friend', 'female', 'garden', 'girdle', 'gravel', 'grudge', 'glitch', 'hacker', 
+        'hazard', 'horrid', 'humble', 'heated', 'invest', 'infant', 'island', 'infamy', 'insane', 'jigsaw', 'jungle', 'knight', 
+        'kettle', 'manual', 'market', 'mirror', 'master', 'myself', 'narrow', 'normal', 'native', 'nectar', 'nature', 'output',
+        'obtuse', 'option', 'orchid', 'orphan', 'parent', 'patent', 'please', 'public', 'prison'];
 
     let insWords = 
-        [];
+        ['ability', 'advance', 'alleged', 'attract', 'auction', 'battery', 'bedroom', 'brother', 'balance', 'believe', 'cabinet',
+        'calling', 'capable', 'capital', 'chronic', 'century', 'dealing', 'decline', 'deposit', 'diverse', 'diamond', 'divided', 
+        'eastern', 'economy', 'elderly', 'element', 'expense', 'factory', 'fashion', 'fishing', 'freedom', 'fortune', 'greater',
+        'genuine', 'genetic', 'granite', 'gourmet', 'geology', 'however', 'history', 'hundred', 'hopeful', 'habitat', 'include',
+        'involve', 'initial', 'inverse', 'implant', 'journal', 'justice', 'jeweler', 'jumping', 'ketchup', 'kindred', 'karaoke', 
+        'limited', 'library', 'lawsuit', 'livable', 'lunatic', 'machine', 'massive', 'maximum', 'measure', 'mystery', 'natural', 
+        'network', 'nursing', 'nothing', 'neutron', 'officer', 'outside', 'orbital', 'oceanic', 'octagon', 'package', 'portion', 
+        'problem', 'premium', 'publish'];
     
     //Function pushes five random words from the indicated list and removes it such that the same word is not selected twice
     //Function pushes the five words to scrambleWords() for scrambling
     function randomWords(wordList) {
+        let fiveWords = [];
         for (let i = 0; i <= 4; i++) {
             let random = Math.floor(Math.random() * wordList.length);
             let word = wordList[random];
@@ -83,23 +91,42 @@ function unscramble(playerWords) {
     let unsolvedWords = playerWords[1];
     let totalPoints = 0;
 
+    console.log("Once per word, you may enter 'shuffle' to rearrange the word- costing 100 points.");
     //Parses through each word for player to unscramble
     for (let i = 0; i < solvedWords.length; i++) {
-        let points = 900;
+        let points = 1000;
         let attempts = 3;
+        let shuffled = false;
 
         console.log("Word " + (i + 1) + "/" + solvedWords.length);
-        let answer = prompt("--- " + unsolvedWords[i] + " ---   ").toLowerCase();
+        let answer = prompt("~*-*~ " + unsolvedWords[i] + " ~*-*~   ").toLowerCase();
         console.log("\n");
+
+        //If player inputs "shuffle", the word will be returned in a new order= possibly the correct order- at the cost of points
+        if (answer === "shuffle") {
+            points -= 100;
+            shuffled = true;
+            unsolvedWords[i] = scrambleWords(unsolvedWords[i]);
+            answer = prompt("~*-*~ " + unsolvedWords[i] + " ~*-*~   ").toLowerCase();
+            console.log("\n");
+        }
         
         //Points are deducted until player guesses word, or until there are no points left to earn
-        while (answer !== solvedWords[i] && points !== 0) {
+        while (answer !== solvedWords[i] && attempts !== 0) {
             points -= 300;
             attempts--;
             console.log("Incorrect. " + attempts + " more attempts. try again...\n");
             answer = prompt("--- " + unsolvedWords[i] + " ---   ").toLowerCase();
             console.log("\n");
+            if (answer === "shuffle" && !shuffled) {
+                points -= 100;
+                shuffled = true;
+                unsolvedWords[i] = scrambleWords(unsolvedWords[i]);
+                answer = prompt("~*-*~ " + unsolvedWords[i] + " ~*-*~   ").toLowerCase();
+                console.log("\n");
+            }
         }
+        if (attempts === 0) {points = 0;};
         totalPoints += points;
     }
     console.log("You've solved all of the words!\nTotal points earned: " + totalPoints + "\n");
