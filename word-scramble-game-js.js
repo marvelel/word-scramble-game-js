@@ -50,21 +50,6 @@ function wordScramble(difficulty) {
         }
         return [fiveWords, scrambleWords(fiveWords)];
     };
-
-    //Function shuffles the letters of each word. Words are recast if still found in order.
-    function scrambleWords(unshuffled) {
-        let shuffled = unshuffled.slice();
-        for (let i = 0; i < shuffled.length; i++) {
-            shuffled[i] = shuffled[i]
-                .split("")
-                .map(value => ({value, sort: Math.random() }))
-                .sort((a, b) => a.sort - b.sort)
-                .map(({value}) => value)
-                .join("");
-                if (shuffled[i] === unshuffled[i]) { i-- };
-        }
-        return shuffled;
-    };
     
     let playerWords = [];
     //Passing randomWords() a list based upon indicated difficulty, and returning the list to play with
@@ -85,6 +70,21 @@ function wordScramble(difficulty) {
     return playerWords;
 };
 
+//Function shuffles the letters of each word. Words are recast if still found in order.
+function scrambleWords(unshuffled) {
+    let shuffled = unshuffled.slice();
+    for (let i = 0; i < shuffled.length; i++) {
+        shuffled[i] = shuffled[i]
+            .split("")
+            .map(value => ({value, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({value}) => value)
+            .join("");
+            if (shuffled[i] === unshuffled[i]) { i-- };
+    }
+    return shuffled;
+};
+
 //Function handles player's interaction with unscrambling the words and returns a score based on the player's success
 function unscramble(playerWords) {
     let solvedWords = playerWords[0];
@@ -102,11 +102,11 @@ function unscramble(playerWords) {
         let answer = prompt("~*-*~ " + unsolvedWords[i] + " ~*-*~   ").toLowerCase();
         console.log("\n");
 
-        //If player inputs "shuffle", the word will be returned in a new order= possibly the correct order- at the cost of points
+        //If player inputs "shuffle", the word will be returned in a new order- possibly the correct order- at the cost of points
         if (answer === "shuffle") {
             points -= 100;
             shuffled = true;
-            unsolvedWords[i] = scrambleWords(unsolvedWords[i]);
+            unsolvedWords[i] = scrambleWords([unsolvedWords[i]])[0];
             answer = prompt("~*-*~ " + unsolvedWords[i] + " ~*-*~   ").toLowerCase();
             console.log("\n");
         }
@@ -121,7 +121,7 @@ function unscramble(playerWords) {
             if (answer === "shuffle" && !shuffled) {
                 points -= 100;
                 shuffled = true;
-                unsolvedWords[i] = scrambleWords(unsolvedWords[i]);
+                unsolvedWords[i] = scrambleWords([unsolvedWords[i]])[0];
                 answer = prompt("~*-*~ " + unsolvedWords[i] + " ~*-*~   ").toLowerCase();
                 console.log("\n");
             }
@@ -179,7 +179,7 @@ function game() {
         }
         if (playPrompt === "no") {stillPlaying = false;}
     }
-    console.log("FINAL SCORES\nEASY: "+easy+"\nMEDIUM: "+med+"\nHARD: "+hard+"\nINSANE: "+insane+"\n");
+    console.log("FINAL SCORES\nEASY: "+easy+"\nMEDIUM: "+med+"\nHARD: "+hard+"\nINSANE: "+insane+"\n\nThanks for playing!");
 }
 
 game();
